@@ -1,0 +1,20 @@
+{
+  "name": "@victorpavn/library-debounce",
+  "description": "Small library for handling debounced calls",
+  "keywords": [
+    "typescript",
+    "debounce"
+  ],
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.3",
+    "vite": "^5.4.8"
+  }
+}
