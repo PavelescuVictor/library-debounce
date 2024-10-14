@@ -33,5 +33,15 @@
     "typescript": "^5.5.3",
     "vite": "^5.4.8",
     "vitest": "^2.1.3"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PavelescuVictor/library-debounce.git"
+  },
+  "author": "Victor Pavelescu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PavelescuVictor/library-debounce/issues"
+  },
+  "homepage": "https://github.com/PavelescuVictor/library-debounce#readme"
 }
