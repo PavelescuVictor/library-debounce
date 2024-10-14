@@ -23,6 +23,8 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.5.0",
+    "@commitlint/config-conventional": "^19.5.0",
     "@types/node": "^22.7.5",
     "prettier": "^3.3.3",
     "typescript": "^5.5.3",
