@@ -12,11 +12,15 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "tsc",
+    "test:dev": "vitest",
+    "test:dev:debug": "vitest --silent=false",
+    "test": "vitest run",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
     "typescript": "^5.5.3",
-    "vite": "^5.4.8"
+    "vite": "^5.4.8",
+    "vitest": "^2.1.3"
   }
 }
