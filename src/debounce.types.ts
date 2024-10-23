@@ -4,6 +4,7 @@ export interface IDebounceConfig {
     maxSkippedCalls?: number,
     leading?: boolean,
     trailing?: boolean,
+    batching?: boolean,
 }
 
 export type Callback = (...args: any[]) => any;

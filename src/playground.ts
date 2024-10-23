@@ -3,19 +3,22 @@ import {
     IDebounceConfig
 } from './debounce.types';
  
-const func = (_b?: number): undefined => {
-    console.log("Debounce");
+const func = (...args: any[]): boolean=> {
+    console.log(args);
+    console.log("Debounced");
+    return true;
 }
 
 const config: IDebounceConfig  = {
-    leading: true,
-    maxSkippedCalls: 5,
-    maxSkippedTime: 1000,
+    // leading: false
+    // maxSkippedCalls: 5,
+    // maxSkippedTime: 1000,
+    batching: true,
 }
 
 const debounced = debounce(func, config);
 const timeoutId = setInterval(() => {
-    debounced();
+    debounced(Math.random());
 }, 100)
 
 setTimeout(() => {
