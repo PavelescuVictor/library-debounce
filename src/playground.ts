@@ -3,22 +3,21 @@ import {
     IDebounceConfig
 } from './debounce.types';
  
-const func = (...args: any[]): boolean=> {
-    console.log(args);
-    console.log("Debounced");
-    return true;
+const isEqual = (a: number, b: number): boolean=> {
+    return a === b;
 }
 
 const config: IDebounceConfig  = {
-    // leading: false
-    // maxSkippedCalls: 5,
-    // maxSkippedTime: 1000,
-    batching: true,
+    // leading: true,
+    maxSkippedCalls: 5,
+    maxSkippedTime: 1000,
+    // batching: true,
+    memoization: true,
 }
 
-const debounced = debounce(func, config);
+const debounced = debounce(isEqual, config);
 const timeoutId = setInterval(() => {
-    debounced(Math.random());
+    debounced(Math.floor(Math.random() * 10 / 3), Math.floor(Math.random() * 10 / 3));
 }, 100)
 
 setTimeout(() => {
