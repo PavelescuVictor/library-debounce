@@ -1,9 +1,9 @@
 import { 
-    IDebounceConfig,
-    Debounce,
     Callback,
     CallbackReturn,
+    Debounce,
     HandleCallback,
+    IDebounceConfig,
 } from './debounce.types';
 
 export const debounce: Debounce = <T extends Callback>(callback: T, config: IDebounceConfig = {}) => {
@@ -47,8 +47,8 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         return undefined;
     }
 
-    const maxSkippedtimeReset = (now: number = -1) => {
-        _startTime = now;
+    const maxSkippedtimeReset = () => {
+        _startTime = Date.now();
     }
 
     const maxSkippedTimeCheck = (handleCallback: HandleCallback<T>): CallbackReturn<T> | undefined => {
@@ -56,10 +56,9 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
             return undefined;
         }
 
-        const now = Date.now();
         let elapsedTime = Date.now() - _startTime;
         if (elapsedTime >= maxSkippedTime) {
-            maxSkippedtimeReset(now);
+            maxSkippedtimeReset();
             return handleCallback();
         }
 
@@ -101,6 +100,8 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
     }
 
     const handleCallback = (_context: unknown, ...args: any[]): CallbackReturn<T> => {
+        maxSkippedCallsReset();
+        maxSkippedtimeReset();
         return callback.apply(_context, args);
     }
 
