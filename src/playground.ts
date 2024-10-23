@@ -1,8 +1,9 @@
 import debounce from './debounce';
 
-const func = () => {
-    console.log("Debounced");
+const func = (_b?: number): undefined => {
+    console.log("Debounce");
 }
+
 const debounced = debounce(func)
 const timeoutId = setInterval(() => {
     debounced();

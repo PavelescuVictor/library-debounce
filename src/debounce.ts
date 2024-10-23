@@ -1,8 +1,12 @@
 import { 
     IDebounceConfig,
+    Debounce,
+    Callback,
+    CallbackReturn,
+    HandleCallback,
 } from './debounce.types';
 
-export const debounce = (callback: Function, config: IDebounceConfig = {}): Function => {
+export const debounce: Debounce = <T extends Callback>(callback: T, config: IDebounceConfig = {}) => {
     const {
         debounceTime = 1000,
         maxSkippedCalls = Infinity,
@@ -11,94 +15,113 @@ export const debounce = (callback: Function, config: IDebounceConfig = {}): Func
         trailing = true,
     } = config;
 
-    let _timeoutId: number | ReturnType<typeof setTimeout> = -1;
+    let _timeoutId: -1 | ReturnType<typeof setTimeout> = -1;
     let _skippedCallsCounter: number = 0;
     let _startTime: number = -1;
     let _shouldLead: boolean = leading;
 
-    const resetCurrentTimeout = () => {
+    const resetCurrentTimeout = (): void=> {
         if (_timeoutId === -1) {
             return;
         }
+        
         clearTimeout(_timeoutId);
         _skippedCallsCounter++;
         _timeoutId = -1;
     }
 
-    const maxSkippedCallsReset = () => {
+    const maxSkippedCallsReset = (): void => {
         _skippedCallsCounter = 0;
     }
 
-    const maxSkippedCallsCheck = (handleCallback: () => void) => {
+    const maxSkippedCallsCheck = (handleCallback: HandleCallback<T>): CallbackReturn<T> => {
         if (maxSkippedCalls === Infinity) {
-            return;
+            return undefined;
         }
 
         if (_skippedCallsCounter >= maxSkippedCalls) {
-            handleCallback();
             maxSkippedCallsReset();
+            return handleCallback();
         }
+
+        return undefined;
     }
 
     const maxSkippedtimeReset = (now: number = -1) => {
         _startTime = now;
     }
 
-    const maxSkippedTimeCheck = (handleCallback: () => void) => {
+    const maxSkippedTimeCheck = (handleCallback: HandleCallback<T>): CallbackReturn<T> | undefined => {
         if (maxSkippedTime === Infinity) {
-            return;
+            return undefined;
         }
 
         const now = Date.now();
         let elapsedTime = Date.now() - _startTime;
         if (elapsedTime >= maxSkippedTime) {
-            handleCallback();
             maxSkippedtimeReset(now);
+            return handleCallback();
         }
+
+        return undefined;
     }
 
-    const leadingCheck = (leading: boolean, handleCallback: () => void) => {
+    const leadingCheck = (leading: boolean, handleCallback: HandleCallback<T>): CallbackReturn<T> | undefined => {
         if (!leading || !_shouldLead) {
-            return;
+            return undefined;
         }
 
-        handleCallback();
         _shouldLead = false;
+        return handleCallback();
     }
 
-    const leadingReset = () => {
+    const leadingReset = (): void => {
         _shouldLead = leading;
     }
 
-    const trailingCheck = (trailing: boolean, handleCallback: () => void) => {
+    const trailingCheck = (trailing: boolean, handleCallback: HandleCallback<T>): CallbackReturn<T> | undefined => {
         if (!trailing) {
-            return;
+            return undefined;
         }
-        handleCallback();
+
+        return handleCallback();
     }
 
-    const handleNewTimeout = (handleCallback: () => void) => {
-        if (_timeoutId) {
+    const handleNewTimeout = (handleCallback: HandleCallback<T>) => {
+        if (_timeoutId !== -1) {
             resetCurrentTimeout();
         }
+
         _timeoutId = setTimeout(() => {
-            trailingCheck(trailing, handleCallback);
             maxSkippedCallsReset();
             maxSkippedtimeReset();
             leadingReset();
-        }, debounceTime)
+            trailingCheck(trailing, handleCallback);
+        }, debounceTime);
     }
 
-    return (...args: any) => {
+    const handleCallback = (_context: unknown, ...args: any[]): CallbackReturn<T> => {
+        return callback.apply(_context, args);
+    }
+
+    return (...args: any[]): CallbackReturn<T> | undefined => {
         const _context = this;
-        const handleCallback = () => {
-            callback.apply(_context, ...args);
-        }
+        const callbackHandler = handleCallback.bind(_context, args);
+
         resetCurrentTimeout();
-        maxSkippedCallsCheck(handleCallback);
-        maxSkippedTimeCheck(handleCallback);
-        leadingCheck(leading, handleCallback);
-        handleNewTimeout(handleCallback);
+
+        maxSkippedCallsCheck(callbackHandler);
+        maxSkippedTimeCheck(callbackHandler);
+
+        const leadingCheckReturn = leadingCheck(leading, callbackHandler);
+
+        handleNewTimeout(callbackHandler);
+
+        if (leadingCheckReturn) {
+            return leadingCheckReturn;
+        }
+
+        return undefined;
     };
 }
 
