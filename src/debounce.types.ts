@@ -1,7 +1,7 @@
 export interface IDebounceConfig {
     debounceTime?: number,
-    maxWaitTime?: number,
-    maxWaitCalls?: number,
+    maxSkippedTime?: number,
+    maxSkippedCalls?: number,
     leading?: boolean,
     trailing?: boolean,
 }
