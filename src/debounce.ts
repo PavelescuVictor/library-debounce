@@ -21,6 +21,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
     let _startTime: number = -1;
     let _shouldLead: boolean = leading;
     let _accumulatedArgsQueue: Parameters<T>[] = [];
+    let _cache = new Map<string, CallbackReturn<T>>();
 
     const resetCurrentTimeout = (): void=> {
         if (_timeoutId === -1) {
@@ -101,17 +102,26 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         }, debounceTime);
     }
 
-    const handleCallback = (_context: unknown, ...args: Parameters<T>): CallbackReturn<T> => {
+    const handleCallback = (args: Parameters<T>): CallbackReturn<T> => {
         maxSkippedCallsReset();
         maxSkippedtimeReset();
 
         const validBatching = batching && _accumulatedArgsQueue.length > 0;
-        let newArgs = validBatching ? ..._accumulatedArgsQueue : args;
+        let newArgs = validBatching ? _accumulatedArgsQueue : args;
         if (validBatching) {
             _accumulatedArgsQueue = [];
         }
 
-        return callback.apply(_context, newArgs);
+        const cacheKey = JSON.stringify(args)
+        if (_cache.has(cacheKey)) {
+            return _cache.get(cacheKey)
+        }
+
+        const _context = this;
+        const result = callback.apply(_context, newArgs);
+        _cache.set(cacheKey, result);
+
+        return result;
     }
 
     return (...args: Parameters<T>): CallbackReturn<T> | undefined => {
