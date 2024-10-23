@@ -13,12 +13,14 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         maxSkippedTime = Infinity,
         leading = false,
         trailing = true,
+        batching = false,
     } = config;
 
     let _timeoutId: -1 | ReturnType<typeof setTimeout> = -1;
     let _skippedCallsCounter: number = 0;
     let _startTime: number = -1;
     let _shouldLead: boolean = leading;
+    let _accumulatedArgsQueue: Parameters<T>[] = [];
 
     const resetCurrentTimeout = (): void=> {
         if (_timeoutId === -1) {
@@ -99,15 +101,26 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         }, debounceTime);
     }
 
-    const handleCallback = (_context: unknown, ...args: any[]): CallbackReturn<T> => {
+    const handleCallback = (_context: unknown, ...args: Parameters<T>): CallbackReturn<T> => {
         maxSkippedCallsReset();
         maxSkippedtimeReset();
-        return callback.apply(_context, args);
+
+        const validBatching = batching && _accumulatedArgsQueue.length > 0;
+        let newArgs = validBatching ? ..._accumulatedArgsQueue : args;
+        if (validBatching) {
+            _accumulatedArgsQueue = [];
+        }
+
+        return callback.apply(_context, newArgs);
     }
 
-    return (...args: any[]): CallbackReturn<T> | undefined => {
+    return (...args: Parameters<T>): CallbackReturn<T> | undefined => {
         const _context = this;
         const callbackHandler = handleCallback.bind(_context, args);
+
+        if (batching) {
+            _accumulatedArgsQueue.push(args);
+        }
 
         resetCurrentTimeout();
 
