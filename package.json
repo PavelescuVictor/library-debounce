@@ -21,7 +21,9 @@
     "test:dev:debug": "vitest --silent=false",
     "test": "vitest run",
     "preview": "vite preview",
-    "pre-commit": "pnpm run lint && pnpm run test"
+    "pre-commit": "pnpm run lint && pnpm run test",
+    "playground": "pnpm ts-node src/playground.ts",
+    "playground:watch": "pnpm ts-node-dev --respawn src/playground.ts"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.5.0",
@@ -30,6 +32,8 @@
     "husky": "^9.1.6",
     "lint-staged": "^15.2.10",
     "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
     "typescript": "^5.5.3",
     "vite": "^5.4.8",
     "vitest": "^2.1.3"
