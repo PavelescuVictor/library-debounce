@@ -5,6 +5,7 @@ export interface IDebounceConfig {
     leading?: boolean,
     trailing?: boolean,
     batching?: boolean,
+    memoization?: boolean,
 }
 
 export type Callback = (...args: any[]) => any;

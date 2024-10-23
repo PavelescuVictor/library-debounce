@@ -14,6 +14,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         leading = false,
         trailing = true,
         batching = false,
+        memoization = false,
     } = config;
 
     let _timeoutId: -1 | ReturnType<typeof setTimeout> = -1;
@@ -112,14 +113,20 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
             _accumulatedArgsQueue = [];
         }
 
-        const cacheKey = JSON.stringify(args)
-        if (_cache.has(cacheKey)) {
-            return _cache.get(cacheKey)
+        let cacheKey = '';
+        if (memoization) {
+            const cacheKey = JSON.stringify(args)
+            if (_cache.has(cacheKey)) {
+                return _cache.get(cacheKey)
+            }
         }
 
         const _context = this;
         const result = callback.apply(_context, newArgs);
-        _cache.set(cacheKey, result);
+        
+        if (memoization) {
+            _cache.set(cacheKey, result);
+        }
 
         return result;
     }

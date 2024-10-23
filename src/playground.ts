@@ -12,6 +12,7 @@ const config: IDebounceConfig  = {
     maxSkippedCalls: 5,
     maxSkippedTime: 1000,
     // batching: true,
+    memoization: true,
 }
 
 const debounced = debounce(isEqual, config);
