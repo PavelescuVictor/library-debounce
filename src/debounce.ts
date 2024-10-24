@@ -1,12 +1,11 @@
 import { 
     Callback,
-    CallbackReturn,
     Debounce,
     HandleCallback,
     IDebounceConfig,
 } from './debounce.types';
 
-export const debounce: Debounce = <T extends Callback>(callback: T, config: IDebounceConfig = {}) => {
+export const debounce: Debounce = <T extends Callback>(callback: T, config: IDebounceConfig = {}): (...args: Parameters<T>) => ReturnType<T> | undefined => {
     const {
         debounceTime = 1000,
         maxSkippedCalls = Infinity,
@@ -22,7 +21,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
     let _startTime: number = -1;
     let _shouldLead: boolean = leading;
     let _accumulatedArgsQueue: Parameters<T>[] = [];
-    let _cache = new Map<string, CallbackReturn<T>>();
+    let _cache = new Map<string, ReturnType<T>>();
 
     const resetCurrentTimeout = (): void=> {
         if (_timeoutId === -1) {
@@ -38,7 +37,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         _skippedCallsCounter = 0;
     }
 
-    const maxSkippedCallsCheck = (handleCallback: HandleCallback<T>): CallbackReturn<T> => {
+    const maxSkippedCallsCheck = (handleCallback: HandleCallback<T>): ReturnType<T> | undefined => {
         if (maxSkippedCalls === Infinity) {
             return undefined;
         }
@@ -55,7 +54,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         _startTime = Date.now();
     }
 
-    const maxSkippedTimeCheck = (handleCallback: HandleCallback<T>): CallbackReturn<T> | undefined => {
+    const maxSkippedTimeCheck = (handleCallback: HandleCallback<T>): ReturnType<T> | undefined => {
         if (maxSkippedTime === Infinity) {
             return undefined;
         }
@@ -69,7 +68,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         return undefined;
     }
 
-    const leadingCheck = (leading: boolean, handleCallback: HandleCallback<T>): CallbackReturn<T> | undefined => {
+    const leadingCheck = (leading: boolean, handleCallback: HandleCallback<T>): ReturnType<T> | undefined => {
         if (!leading || !_shouldLead) {
             return undefined;
         }
@@ -82,7 +81,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         _shouldLead = leading;
     }
 
-    const trailingCheck = (trailing: boolean, handleCallback: HandleCallback<T>): CallbackReturn<T> | undefined => {
+    const trailingCheck = (trailing: boolean, handleCallback: HandleCallback<T>): ReturnType<T> | undefined => {
         if (!trailing) {
             return undefined;
         }
@@ -103,7 +102,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         }, debounceTime);
     }
 
-    const handleCallback = (args: Parameters<T>): CallbackReturn<T> => {
+    const handleCallback = (args: Parameters<T>): ReturnType<T> | undefined => {
         maxSkippedCallsReset();
         maxSkippedtimeReset();
 
@@ -131,7 +130,7 @@ export const debounce: Debounce = <T extends Callback>(callback: T, config: IDeb
         return result;
     }
 
-    return (...args: Parameters<T>): CallbackReturn<T> | undefined => {
+    return (...args: Parameters<T>): ReturnType<T> | undefined => {
         const _context = this;
         const callbackHandler = handleCallback.bind(_context, args);
 
